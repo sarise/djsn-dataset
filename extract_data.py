@@ -106,12 +106,15 @@ def main(starting_period, months):
             if periode > 64:
                 return
             print periode
+
             for propinsi, kabupatens in daftar_kabupaten.iteritems():
+                aggregate_propinsi = []
                 for kabupaten_id, kabupaten_name in kabupatens.iteritems():
                     print kabupaten_id,
                     data_kabupaten = process_kabupaten(periode=periode, propinsi=propinsi, kabupaten=kabupaten_id)
                     data_kabupaten['aaa_kabupaten_name'] = kabupaten_name
-                    out_csv.writerow(data_kabupaten)
+                    aggregate_propinsi.append(data_kabupaten)
+                out_csv.writerows(aggregate_propinsi)
                 print
 
 
