@@ -31,6 +31,7 @@ curl 'http://180.250.242.162/server_djsn/kepesertaan/proporsi.php?periode=61&pro
 '''
 
 DATA_PAGE = 'http://180.250.242.162/server_djsn/kepesertaan/proporsi.php'
+session = requests.Session()
 
 
 def curl_to_url_params_headers_cookies(curl_string):
@@ -50,7 +51,6 @@ def download_data_kabupaten(periode, propinsi, kabupaten):
     }
     _, _, headers, cookies = curl_to_url_params_headers_cookies(DOWNLOAD_CURL)
 
-    session = requests.Session()
     session.headers.update(headers)
     session.cookies.update(cookies)
 
