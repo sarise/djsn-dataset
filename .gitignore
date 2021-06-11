@@ -1,0 +1,10 @@
+.gitignore
+.coverage
+.eggs/
+.idea/
+.tox/
+.venv/
+output/
+djsn_scrapper.egg-info/
+__pycache__
+*.pyc
