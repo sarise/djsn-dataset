@@ -18,6 +18,8 @@ from urlparse import (
     urljoin,
 )
 
+SAMPLE_OUTPUT_PER_KABUPATEN = 'sample_extracted_data_per_kabupaten.json'
+
 DOWNLOAD_CURL = \
 '''
 curl 'http://180.250.242.162/server_djsn/kepesertaan/proporsi.php?periode=61&propinsi=1&kabupaten=19&tahun=2021&callback=receiveproporsi&_=1623324442259' 
@@ -77,17 +79,19 @@ def simplify_data(data_kabupaten, kabupaten_id):
 
 def process_kabupaten(periode, propinsi, kabupaten):
     data_kabupaten = download_data_kabupaten(periode, propinsi, kabupaten)
-
-    # with open('sample_kabupaten.json', 'w') as f:
-    #     json.dump(data_kabupaten, f, indent=4)
-    # with open('sample_kabupaten') as f:
-    #     data_kabupaten = json.load(f)
-
     return simplify_data(data_kabupaten, kabupaten)
 
 
+def prepare_dummy_for_knowing_headers():
+    data_kabupaten = process_kabupaten(periode=1, propinsi=1, kabupaten=1)
+    data_kabupaten['aaa_kabupaten_name'] = "fake kabupaten name"
+
+    with open(SAMPLE_OUTPUT_PER_KABUPATEN, 'w') as f:
+        json.dump(data_kabupaten, f, indent=4, sort_keys=True)
+
+
 def get_headers_from_dummy():
-    with open('sample_processed_kabupaten.json') as f:
+    with open(SAMPLE_OUTPUT_PER_KABUPATEN) as f:
         data_kabupaten = json.load(f)
     return data_kabupaten.keys()
 
@@ -96,6 +100,8 @@ def main(starting_period, months):
     # Retrieve the list of all kabupatens across propinsis
     with open('daftar_kabupaten.json') as f:
         daftar_kabupaten = json.load(f)
+
+    prepare_dummy_for_knowing_headers()
 
     with open('aggregate_%d.csv' % starting_period, 'wb') as csvfile:
         headers = get_headers_from_dummy()
