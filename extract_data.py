@@ -1,3 +1,16 @@
+import csv
+import requests
+import sys
+import uncurl
+
+from datetime import datetime
+from urlparse import (
+    parse_qsl,
+    urlparse,
+    urlsplit,
+    urljoin,
+)
+
 try:
     import ujson as json
 except ImportError:
@@ -5,18 +18,6 @@ except ImportError:
         import simplejson as json
     except ImportError:
         import json
-
-import csv
-import requests
-import sys
-import uncurl
-
-from urlparse import (
-    parse_qsl,
-    urlparse,
-    urlsplit,
-    urljoin,
-)
 
 SAMPLE_OUTPUT_PER_KABUPATEN = 'sample_extracted_data_per_kabupaten.json'
 
@@ -127,5 +128,6 @@ def main(starting_period, months):
 if __name__ == '__main__':
     starting_period = int(sys.argv[1])
     months = int(sys.argv[2]) if len(sys.argv) > 2 else 5
-    print(starting_period, months)
+    print(datetime.now())
+    print('Downloading data per kabupubaten starting from period %d.\nNumber of months: %d' % (starting_period, months))
     main(starting_period, months)
