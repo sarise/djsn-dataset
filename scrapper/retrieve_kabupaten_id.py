@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 import uncurl
@@ -8,6 +9,8 @@ from urlparse import (
     urlsplit,
     urljoin,
 )
+
+OUTPUT_DIR = 'output'
 
 DOWNLOAD_CURL = \
 '''
@@ -59,8 +62,18 @@ def main():
     for propinsi_id in range(1, 35):
         all_propinsi[propinsi_id] = download_kabupatens(propinsi=propinsi_id)
 
-    with open('daftar_kabupaten.json', 'w') as f:
+    try:
+        os.makedirs(OUTPUT_DIR)
+    except OSError:
+        if not os.path.isdir(OUTPUT_DIR):
+            raise
+
+    output_file = os.path.join(OUTPUT_DIR, 'daftar_kabupaten.json')
+
+    print('Writing the list of kabupatens in %s' % output_file)
+    with open(output_file, 'w') as f:
         json.dump(all_propinsi, f, indent=4, sort_keys=True)
+    print('Done')
 
 
 if __name__ == '__main__':
