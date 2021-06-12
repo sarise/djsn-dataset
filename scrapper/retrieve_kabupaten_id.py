@@ -1,6 +1,5 @@
 import json
 import os
-
 import requests
 import uncurl
 from urlparse import (
@@ -10,7 +9,10 @@ from urlparse import (
     urljoin,
 )
 
-OUTPUT_DIR = 'output'
+from scrapper.constants import (
+    KABUPATEN_IDS_FILE,
+    OUTPUT_DIR,
+)
 
 DOWNLOAD_CURL = \
 '''
@@ -68,10 +70,8 @@ def main():
         if not os.path.isdir(OUTPUT_DIR):
             raise
 
-    output_file = os.path.join(OUTPUT_DIR, 'daftar_kabupaten.json')
-
-    print('Writing the list of kabupatens in %s' % output_file)
-    with open(output_file, 'w') as f:
+    print('Writing the list of kabupatens in %s' % KABUPATEN_IDS_FILE)
+    with open(KABUPATEN_IDS_FILE, 'w') as f:
         json.dump(all_propinsi, f, indent=4, sort_keys=True)
     print('Done')
 

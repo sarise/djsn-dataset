@@ -1,3 +1,4 @@
+import argparse
 import csv
 import requests
 import sys
@@ -11,6 +12,12 @@ from urlparse import (
     urljoin,
 )
 
+from scrapper.constants import (
+    KABUPATEN_IDS_FILE,
+    OUTPUT_AGGREGATE_FILE,
+    SAMPLE_EXTRACTED_KABUPATEN_FILE,
+)
+
 try:
     import ujson as json
 except ImportError:
@@ -18,8 +25,6 @@ except ImportError:
         import simplejson as json
     except ImportError:
         import json
-
-SAMPLE_OUTPUT_PER_KABUPATEN = 'sample_extracted_data_per_kabupaten.json'
 
 DOWNLOAD_CURL = \
 '''
@@ -64,9 +69,9 @@ def download_data_kabupaten(periode, propinsi, kabupaten):
 
 def simplify_data(data_kabupaten, kabupaten_id):
     relevant_data = {
-        'aaa_kabupaten': kabupaten_id,
-        'aaa_tahun': data_kabupaten['periode']['tahun'],
-        'aaa_bulan': data_kabupaten['periode']['bln'],
+        '_kabupaten': kabupaten_id,
+        '__tahun': data_kabupaten['periode']['tahun'],
+        '_bulan': data_kabupaten['periode']['bln'],
     }
     for key, values in data_kabupaten.iteritems():
         if values and isinstance(values, list):
@@ -85,26 +90,28 @@ def process_kabupaten(periode, propinsi, kabupaten):
 
 def prepare_dummy_for_knowing_headers():
     data_kabupaten = process_kabupaten(periode=1, propinsi=1, kabupaten=1)
-    data_kabupaten['aaa_kabupaten_name'] = "fake kabupaten name"
+    data_kabupaten['_kabupaten_name'] = "fake kabupaten name"
 
-    with open(SAMPLE_OUTPUT_PER_KABUPATEN, 'w') as f:
+    with open(SAMPLE_EXTRACTED_KABUPATEN_FILE, 'w') as f:
         json.dump(data_kabupaten, f, indent=4, sort_keys=True)
 
 
 def get_headers_from_dummy():
-    with open(SAMPLE_OUTPUT_PER_KABUPATEN) as f:
+    with open(SAMPLE_EXTRACTED_KABUPATEN_FILE) as f:
         data_kabupaten = json.load(f)
     return data_kabupaten.keys()
 
 
-def main(starting_period, months):
+def process(starting_period, months):
     # Retrieve the list of all kabupatens across propinsis
-    with open('daftar_kabupaten.json') as f:
+    with open(KABUPATEN_IDS_FILE) as f:
         daftar_kabupaten = json.load(f)
 
     prepare_dummy_for_knowing_headers()
 
-    with open('aggregate_%d.csv' % starting_period, 'wb') as csvfile:
+    output_file = OUTPUT_AGGREGATE_FILE % starting_period
+    print('Writing extracted data to %s' % output_file)
+    with open(output_file, 'wb') as csvfile:
         headers = get_headers_from_dummy()
         headers = sorted(headers)
         out_csv = csv.DictWriter(csvfile, headers)
@@ -119,15 +126,31 @@ def main(starting_period, months):
                 for kabupaten_id, kabupaten_name in kabupatens.iteritems():
                     print kabupaten_id,
                     data_kabupaten = process_kabupaten(periode=periode, propinsi=propinsi, kabupaten=kabupaten_id)
-                    data_kabupaten['aaa_kabupaten_name'] = kabupaten_name
+                    data_kabupaten['_kabupaten_name'] = kabupaten_name
                     aggregate_propinsi.append(data_kabupaten)
                 out_csv.writerows(aggregate_propinsi)
                 print
 
 
-if __name__ == '__main__':
-    starting_period = int(sys.argv[1])
-    months = int(sys.argv[2]) if len(sys.argv) > 2 else 5
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description='A script to collect the statistical data from DJSN.')
+    parser.add_argument('starting_period', type=int,
+                        help='Note: January 2016 is 1')
+    parser.add_argument('months', type=int,
+                        help='The number of months to be collected.')
+    return parser.parse_args()
+
+
+def main():
+    args = parse_arguments()
     print(datetime.now())
-    print('Downloading data per kabupubaten starting from period %d.\nNumber of months: %d' % (starting_period, months))
-    main(starting_period, months)
+    print('Downloading data per kabupaten starting from period %d.\nNumber of months: %d' % (
+        args.starting_period,
+        args.months
+    ))
+    process(args.starting_period, args.months)
+
+
+if __name__ == '__main__':
+    main()

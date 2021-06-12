@@ -12,6 +12,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
+            'extract_data = scrapper.extract_data:main',
             'retrieve_kabupaten_id = scrapper.retrieve_kabupaten_id:main',
         ],
     },
