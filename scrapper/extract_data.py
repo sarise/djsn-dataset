@@ -15,7 +15,7 @@ from urlparse import (
 from scrapper.constants import (
     KABUPATEN_IDS_FILE,
     OUTPUT_AGGREGATE_FILE,
-    SAMPLE_EXTRACTED_KABUPATEN_FILE,
+    SAMPLE_EXTRACTED_KABUPATEN_FILE, SAMPLE_RAW_FILE,
 )
 
 try:
@@ -135,21 +135,29 @@ def process(starting_period, months):
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description='A script to collect the statistical data from DJSN.')
-    parser.add_argument('starting_period', type=int,
+    parser.add_argument('--starting-period', type=int,
                         help='Note: January 2016 is 1')
-    parser.add_argument('months', type=int,
+    parser.add_argument('--months', type=int,
                         help='The number of months to be collected.')
+    parser.add_argument('--raw-sample', action='store_true', default=False,
+                        help='Only download and store the raw data for a certain kabupaten.')
     return parser.parse_args()
 
 
 def main():
     args = parse_arguments()
     print(datetime.now())
-    print('Downloading data per kabupaten starting from period %d.\nNumber of months: %d' % (
-        args.starting_period,
-        args.months
-    ))
-    process(args.starting_period, args.months)
+
+    if args.raw_sample:
+        raw_sample = download_data_kabupaten(periode=61, propinsi=1, kabupaten=6)
+        with open(SAMPLE_RAW_FILE, 'w') as f:
+            json.dump(raw_sample, f, indent=4, sort_keys=True)
+    else:
+        print('Downloading data per kabupaten starting from period %d.\nNumber of months: %d' % (
+            args.starting_period,
+            args.months
+        ))
+        process(args.starting_period, args.months)
 
 
 if __name__ == '__main__':
