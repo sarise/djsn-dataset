@@ -146,10 +146,11 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    print(datetime.now())
+    print('Start time: %s' % datetime.now())
 
     if args.raw_sample:
         raw_sample = download_data_kabupaten(periode=61, propinsi=1, kabupaten=6)
+        print('Writing raw data sample to %s' % SAMPLE_RAW_FILE)
         with open(SAMPLE_RAW_FILE, 'w') as f:
             json.dump(raw_sample, f, indent=4, sort_keys=True)
     else:
@@ -158,6 +159,7 @@ def main():
             args.months
         ))
         process(args.starting_period, args.months)
+    print('Done.')
 
 
 if __name__ == '__main__':

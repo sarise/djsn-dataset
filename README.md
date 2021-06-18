@@ -7,6 +7,8 @@ data related to the Indonesian social welfare system.
 I focus on the state-owned healthcare insurance 
 (Jaminan Kesehatan Nasional a.k.a. JKN) data.
 
+_This code is developed on Python 2.7_
+
 ## How to use the script
 1. Create a virtualenv and install the python module, including its dependency
 ```
@@ -26,36 +28,35 @@ retrieve_kabupaten_id
 
 3. Run the script to download and aggregate data of all kabupatens for a given period of time
 ```
-extract_data 6 1
-# 2021-06-12 11:38:36.139625
-# Downloading data per kabupaten starting from period 6.
+extract_data --starting-period 11 --months 1
+# Start time: 2021-06-18 14:11:29.041660
+# Downloading data per kabupaten starting from period 11.
 # Number of months: 1
-# Writing extracted data to /Users/sari/repositories/djsn_scrapper/output/aggregate_6.csv
-# 6
-# 366 367 370 368 369
-# ...
+# Writing extracted data to /Users/sari/repositories/djsn_scrapper/output/aggregate_011.csv
+# 11
+# 366 367 370 368 369 ...
 ```
 
 ## How to parallelize the job
 1. Spawn multiple processes with a different starting period 
 ```
-extract_data 1 5
-extract_data 6 5
-extract_data 11 5
-extract_data 16 5
-extract_data 21 5
-extract_data 26 5
-extract_data 31 5
-extract_data 36 5
-extract_data 41 5
-extract_data 46 5
-extract_data 51 5
-extract_data 56 5
-extract_data 61 5
+extract_data --starting-period 1 --months 5
+extract_data --starting-period 6 --months 5
+extract_data --starting-period 11 --months 5
+extract_data --starting-period 16 --months 5
+extract_data --starting-period 21 --months 5
+extract_data --starting-period 26 --months 5
+extract_data --starting-period 31 --months 5
+extract_data --starting-period 36 --months 5
+extract_data --starting-period 41 --months 5
+extract_data --starting-period 46 --months 5
+extract_data --starting-period 51 --months 5
+extract_data --starting-period 56 --months 5
+extract_data --starting-period 61 --months 5
 ```
-2. Combine the output files into one csv file.
+2. Combine the output files into one csv file. 
+   Note that each output file has headers. The final file should only keep one set of headers.
+_Assuming that "\_\_tahun" is the starting string of the header line._
 ```
-
+grep "^__tahun" output/aggregate_001.csv > aggregate.csv && grep -vh "^__tahun" output/aggregate_*csv >> aggregate.csv
 ```
-
-
